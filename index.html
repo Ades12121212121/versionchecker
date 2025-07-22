@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvolutionX Executor</title>
+  <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Ades12121212121/versionchecker/refs/heads/main/EvolutinX.ico">
+  <style>
+    :root {
+      --azul-claro: #4fc3f7;
+      --negro: #181a1b;
+      --gris: #2e2e2e;
+      --blanco: #f5f5f5;
+      --azul-hover: #2196f3;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--negro) 60%, var(--gris) 100%);
+      color: var(--blanco);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    .navbar {
+      width: 100%;
+      background: rgba(30,30,30,0.95);
+      box-shadow: 0 2px 16px 0 rgba(31, 38, 135, 0.17);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: fadeInDown 1s;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .nav-logo img {
+      width: 48px;
+      height: 48px;
+      filter: drop-shadow(0 0 12px var(--azul-claro));
+      animation: logoPop 1.2s;
+    }
+    .nav-logo span {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--azul-claro), var(--blanco));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-link {
+      color: var(--blanco);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .nav-link::after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 2px;
+      background: var(--azul-claro);
+      transition: width 0.3s;
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--azul-claro);
+    }
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2.5rem auto 0 auto;
+      padding: 2rem;
+      background: rgba(30,30,30,0.7);
+      border-radius: 2rem;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+      animation: fadeIn 1.2s;
+    }
+    .section {
+      display: none;
+      animation: fadeIn 1s;
+    }
+    .section.active {
+      display: block;
+    }
+    .logo-big {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 24px var(--azul-claro));
+      animation: logoPop 1.5s cubic-bezier(.68,-0.55,.27,1.55);
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin: 0 0 0.5rem 0;
+      background: linear-gradient(90deg, var(--azul-claro), var(--blanco));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      animation: textGlow 2s infinite alternate;
+    }
+    .version {
+      font-size: 1.2rem;
+      color: var(--azul-claro);
+      margin-bottom: 1.5rem;
+      letter-spacing: 1px;
+      text-align: center;
+      animation: fadeIn 2s 0.5s backwards;
+    }
+    .desc {
+      font-size: 1.1rem;
+      color: var(--blanco);
+      margin-bottom: 2rem;
+      text-align: center;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeIn 2s 1s backwards;
+    }
+    .download-btn {
+      display: inline-block;
+      background: linear-gradient(90deg, var(--azul-claro), var(--gris));
+      color: var(--negro);
+      border: none;
+      border-radius: 2rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px 0 rgba(79,195,247,0.2);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      margin: 2rem auto 0 auto;
+      animation: btnPop 1.2s 1.2s cubic-bezier(.68,-0.55,.27,1.55) backwards;
+    }
+    .download-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 32px 0 rgba(79,195,247,0.4);
+      background: linear-gradient(90deg, var(--azul-claro) 60%, var(--blanco));
+    }
+    .scripts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-top: 2rem;
+    }
+    .script-card {
+      background: rgba(44, 44, 44, 0.85);
+      border-radius: 1rem;
+      padding: 1.2rem 1.5rem;
+      box-shadow: 0 2px 12px 0 rgba(79,195,247,0.08);
+      color: var(--blanco);
+      transition: box-shadow 0.2s;
+      border-left: 4px solid var(--azul-claro);
+    }
+    .script-card:hover {
+      box-shadow: 0 4px 24px 0 rgba(79,195,247,0.18);
+    }
+    .api-doc {
+      background: rgba(44, 44, 44, 0.85);
+      border-radius: 1rem;
+      padding: 1.2rem 1.5rem;
+      margin-top: 2rem;
+      color: var(--blanco);
+      font-size: 1rem;
+      box-shadow: 0 2px 12px 0 rgba(79,195,247,0.08);
+    }
+    @keyframes logoPop {
+      0% { transform: scale(0.5) rotate(-30deg); opacity: 0; }
+      60% { transform: scale(1.1) rotate(8deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); }
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-60px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 8px var(--azul-claro); }
+      100% { text-shadow: 0 0 24px var(--azul-claro), 0 0 8px var(--blanco); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes btnPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @media (max-width: 700px) {
+      .container { padding: 1rem; }
+      h1 { font-size: 2rem; }
+      .nav-links { gap: 1rem; }
+      .nav-logo span { font-size: 1.1rem; }
+    }
+    @media (max-width: 500px) {
+      .container { padding: 0.3rem; }
+      .nav-logo img { width: 32px; height: 32px; }
+      .logo-big { width: 80px; height: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="https://raw.githubusercontent.com/Ades12121212121/versionchecker/refs/heads/main/EvolutinX.ico" alt="EvolutionX Logo" draggable="false">
+      <span>EvolutionX</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-section="home">Home</a>
+      <a href="#" class="nav-link" data-section="scripts">Scripts</a>
+      <a href="#" class="nav-link" data-section="downloads">Downloads</a>
+      <a href="#" class="nav-link" data-section="api">API</a>
+    </div>
+  </nav>
+  <div class="container">
+    <!-- Home Section -->
+    <section class="section active" id="home">
+      <img src="https://raw.githubusercontent.com/Ades12121212121/versionchecker/refs/heads/main/EvolutinX.ico" alt="EvolutionX Logo" class="logo-big" draggable="false">
+      <h1>EvolutionX Executor</h1>
+      <div class="version">Versión 1.0.0</div>
+      <div class="desc">
+        El executor más avanzado y elegante para Roblox.<br>
+        Disfruta de velocidad, seguridad y una experiencia visual única.<br>
+        ¡Bienvenido a la evolución!
+      </div>
+    </section>
+    <!-- Scripts Section -->
+    <section class="section" id="scripts">
+      <h1>Scripts</h1>
+      <div class="desc">Explora y descarga scripts populares para Roblox. (¡Pronto podrás agregar los tuyos!)</div>
+      <div class="scripts-list">
+        <div class="script-card">
+          <strong>Script 1:</strong> <code>print('Hello EvolutionX!')</code>
+        </div>
+        <div class="script-card">
+          <strong>Script 2:</strong> <code>game.Players.LocalPlayer:Kick('¡Actualiza EvolutionX!')</code>
+        </div>
+        <!-- Agrega más scripts aquí -->
+      </div>
+    </section>
+    <!-- Downloads Section -->
+    <section class="section" id="downloads">
+      <h1>Descargas</h1>
+      <div class="desc">
+        Descarga la última versión de EvolutionX Executor para Roblox.<br>
+        <a href="https://t.me/EvolutionXExecutor" class="download-btn">Descargar EvolutionX</a>
+      </div>
+    </section>
+    <!-- API Section -->
+    <section class="section" id="api">
+      <h1>API</h1>
+      <div class="desc">
+        Documentación de la API para integraciones y automatizaciones.<br>
+        (Próximamente más detalles)
+      </div>
+      <div class="api-doc">
+        <strong>GET</strong> <code>/api/version</code> — Devuelve la versión actual de EvolutionX.<br>
+        <strong>GET</strong> <code>/api/scripts</code> — Lista los scripts disponibles.<br>
+        <!-- Agrega más endpoints aquí -->
+      </div>
+    </section>
+  </div>
+  <script>
+    // Navegación SPA simple
+    const links = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        const section = link.getAttribute('data-section');
+        sections.forEach(sec => {
+          sec.classList.remove('active');
+          if(sec.id === section) sec.classList.add('active');
+        });
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      });
+    });
+  </script>
+</body>
+</html>
