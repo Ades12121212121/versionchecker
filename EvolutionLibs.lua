@@ -203,6 +203,106 @@ EvolutionLibs.Themes = {
 	}
 }
 
+-- Definir clase Tab antes de Window
+local Tab = {}
+Tab.__index = Tab
+
+function Tab:CreateUI()
+	-- Botón en la sidebar
+	self.Button = Instance.new("TextButton")
+	self.Button.Name = "TabButton_" .. self.Name
+	self.Button.Size = UDim2.new(1, -10, 0, 40)
+	self.Button.BackgroundColor3 = self.Window.Theme.Secondary
+	self.Button.BorderSizePixel = 0
+	self.Button.Text = ""
+	self.Button.ZIndex = 5
+	self.Button.Parent = self.Window.TabList
+	
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 6)
+	buttonCorner.Parent = self.Button
+	
+	-- Icono y texto
+	local layout = Instance.new("UIListLayout")
+	layout.FillDirection = Enum.FillDirection.Horizontal
+	layout.VerticalAlignment = Enum.VerticalAlignment.Center
+	layout.Padding = UDim.new(0, 8)
+	layout.Parent = self.Button
+	
+	local padding = Instance.new("UIPadding")
+	padding.PaddingLeft = UDim.new(0, 12)
+	padding.Parent = self.Button
+	
+	if self.Icon then
+		local icon = Instance.new("ImageLabel")
+		icon.Name = "Icon"
+		icon.Size = UDim2.new(0, 20, 0, 20)
+		icon.BackgroundTransparency = 1
+		icon.Image = self.Icon
+		icon.ImageColor3 = self.Window.Theme.TextSecondary
+		icon.ZIndex = 6
+		icon.Parent = self.Button
+	end
+	
+	local label = Instance.new("TextLabel")
+	label.Name = "Label"
+	label.Size = UDim2.new(1, self.Icon and -28 or 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = self.Name
+	label.TextColor3 = self.Window.Theme.TextSecondary
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 14
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.ZIndex = 6
+	label.Parent = self.Button
+	
+	-- Contenido de la pestaña
+	self.Container = Instance.new("ScrollingFrame")
+	self.Container.Name = "TabContainer_" .. self.Name
+	self.Container.Size = UDim2.new(1, 0, 1, 0)
+	self.Container.Position = UDim2.new(0, 0, 0, 0)
+	self.Container.BackgroundTransparency = 1
+	self.Container.BorderSizePixel = 0
+	self.Container.ScrollBarThickness = 6
+	self.Container.ScrollBarImageColor3 = self.Window.Theme.Primary
+	self.Container.ZIndex = 4
+	self.Container.Visible = false
+	self.Container.Parent = self.Window.Content
+	
+	local containerLayout = Instance.new("UIListLayout")
+	containerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	containerLayout.Padding = UDim.new(0, 8)
+	containerLayout.Parent = self.Container
+	
+	local containerPadding = Instance.new("UIPadding")
+	containerPadding.PaddingTop = UDim.new(0, 15)
+	containerPadding.PaddingBottom = UDim.new(0, 15)
+	containerPadding.PaddingLeft = UDim.new(0, 20)
+	containerPadding.PaddingRight = UDim.new(0, 20)
+	containerPadding.Parent = self.Container
+	
+	self.Button.MouseButton1Click:Connect(function()
+		self.Window:SelectTab(self)
+	end)
+	Utils:CreateRipple(self.Button, self.Window.Theme.Primary)
+	self.Button.MouseEnter:Connect(function()
+		if not self.Active then
+			Utils:Animate(self.Button, {BackgroundColor3 = Utils:LerpColor(self.Window.Theme.Secondary, self.Window.Theme.Primary, 0.1)})
+		end
+	end)
+	self.Button.MouseLeave:Connect(function()
+		if not self.Active then
+			Utils:Animate(self.Button, {BackgroundColor3 = self.Window.Theme.Secondary})
+		end
+	end)
+	containerLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		self.Container.CanvasSize = UDim2.new(0, 0, 0, containerLayout.AbsoluteContentSize.Y)
+	end)
+end
+
+-- Window debe estar después de Tab
+tab_class_defined = true
+
 -- Clase Window principal
 local Window = {}
 Window.__index = Window
@@ -447,7 +547,7 @@ function Window:CreateTab(name, icon)
 		Icon = icon,
 		Elements = {},
 		Active = false
-	}, {__index = Tab})
+	}, Tab)
 	
 	tab:CreateUI()
 	table.insert(self.Tabs, tab)
@@ -612,109 +712,6 @@ function Window:Hide()
 end
 
 -- Clase Tab
-local Tab = {}
-Tab.__index = Tab
-
-function Tab:CreateUI()
-	-- Botón en la sidebar
-	self.Button = Instance.new("TextButton")
-	self.Button.Name = "TabButton_" .. self.Name
-	self.Button.Size = UDim2.new(1, -10, 0, 40)
-	self.Button.BackgroundColor3 = self.Window.Theme.Secondary
-	self.Button.BorderSizePixel = 0
-	self.Button.Text = ""
-	self.Button.ZIndex = 5
-	self.Button.Parent = self.Window.TabList
-	
-	local buttonCorner = Instance.new("UICorner")
-	buttonCorner.CornerRadius = UDim.new(0, 6)
-	buttonCorner.Parent = self.Button
-	
-	-- Icono y texto
-	local layout = Instance.new("UIListLayout")
-	layout.FillDirection = Enum.FillDirection.Horizontal
-	layout.VerticalAlignment = Enum.VerticalAlignment.Center
-	layout.Padding = UDim.new(0, 8)
-	layout.Parent = self.Button
-	
-	local padding = Instance.new("UIPadding")
-	padding.PaddingLeft = UDim.new(0, 12)
-	padding.Parent = self.Button
-	
-	if self.Icon then
-		local icon = Instance.new("ImageLabel")
-		icon.Name = "Icon"
-		icon.Size = UDim2.new(0, 20, 0, 20)
-		icon.BackgroundTransparency = 1
-		icon.Image = self.Icon
-		icon.ImageColor3 = self.Window.Theme.TextSecondary
-		icon.ZIndex = 6
-		icon.Parent = self.Button
-	end
-	
-	local label = Instance.new("TextLabel")
-	label.Name = "Label"
-	label.Size = UDim2.new(1, self.Icon and -28 or 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = self.Name
-	label.TextColor3 = self.Window.Theme.TextSecondary
-	label.Font = Enum.Font.Gotham
-	label.TextSize = 14
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.ZIndex = 6
-	label.Parent = self.Button
-	
-	-- Contenido de la pestaña
-	self.Container = Instance.new("ScrollingFrame")
-	self.Container.Name = "TabContainer_" .. self.Name
-	self.Container.Size = UDim2.new(1, 0, 1, 0)
-	self.Container.Position = UDim2.new(0, 0, 0, 0)
-	self.Container.BackgroundTransparency = 1
-	self.Container.BorderSizePixel = 0
-	self.Container.ScrollBarThickness = 6
-	self.Container.ScrollBarImageColor3 = self.Window.Theme.Primary
-	self.Container.ZIndex = 4
-	self.Container.Visible = false
-	self.Container.Parent = self.Window.Content
-	
-	local containerLayout = Instance.new("UIListLayout")
-	containerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	containerLayout.Padding = UDim.new(0, 8)
-	containerLayout.Parent = self.Container
-	
-	local containerPadding = Instance.new("UIPadding")
-	containerPadding.PaddingTop = UDim.new(0, 15)
-	containerPadding.PaddingBottom = UDim.new(0, 15)
-	containerPadding.PaddingLeft = UDim.new(0, 20)
-	containerPadding.PaddingRight = UDim.new(0, 20)
-	containerPadding.Parent = self.Container
-	
-	-- Eventos
-	self.Button.MouseButton1Click:Connect(function()
-		self.Window:SelectTab(self)
-	end)
-	
-	-- Efectos
-	Utils:CreateRipple(self.Button, self.Window.Theme.Primary)
-	
-	self.Button.MouseEnter:Connect(function()
-		if not self.Active then
-			Utils:Animate(self.Button, {BackgroundColor3 = Utils:LerpColor(self.Window.Theme.Secondary, self.Window.Theme.Primary, 0.1)})
-		end
-	end)
-	
-	self.Button.MouseLeave:Connect(function()
-		if not self.Active then
-			Utils:Animate(self.Button, {BackgroundColor3 = self.Window.Theme.Secondary})
-		end
-	end)
-	
-	-- Actualizar layout del contenedor
-	containerLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		self.Container.CanvasSize = UDim2.new(0, 0, 0, containerLayout.AbsoluteContentSize.Y)
-	end)
-end
-
 function Tab:SetActive(active)
 	self.Active = active
 	
